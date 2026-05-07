@@ -4,4 +4,4 @@ This is a simple CLI-based program that acts as a graphing calculator in the ter
 
 ## TODO
 - Need to figure out how to add simple math module functions into simpleeval so that I can graph sin, cos, etc.
-- Create class for figure to be constructed and then printed to the terminal
+- Need to deal with nans that appear when trying to graph functions not defined on the whole domain i.e. sqrt
