@@ -1,5 +1,6 @@
 import ast
 import os
+import warnings
 
 from simpleeval import SimpleEval, BASIC_ALLOWED_ATTRS, safe_power
 from math import *
@@ -11,6 +12,10 @@ def gen_fdata(f_str, xmin, xmax, scale):
     def f(x):
         s = SimpleEval(allowed_attrs=BASIC_ALLOWED_ATTRS)
         s.operators[ast.BitXor] = safe_power
+        s.functions = {"exp":exp, "ln": log, "log": log, "log2": log2, "log10":log10,
+                       "acos": acos, "asin":asin, "atan":atan,"cos":cos,"sin":sin,"tan":tan,
+                       "acosh":acosh,"asinh":asinh,"atanh":atanh,"cosh":cosh,"sinh":sinh, "tanh":tanh,
+                       "erf": erf, "erfc":erfc, "gamma":gamma, "lgamma":lgamma}
         s.names = {"x" : x}
         return s.eval(f_str)
     
@@ -19,8 +24,12 @@ def gen_fdata(f_str, xmin, xmax, scale):
     xgrid = linspace(xmin,xmax,size)
     res = []
     for x in xgrid:
-        res.append([float(x),float(f(x))])
-        
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            try:
+                res.append([float(x),float(f(x))])
+            except:
+                res.append([float(x),float(nan)])
     script_dir = os.path.dirname(__file__)
     filepath = os.path.join(script_dir, "data.csv")
     with open(filepath, "w") as file:

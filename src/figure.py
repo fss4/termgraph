@@ -1,6 +1,6 @@
 import csv
 from math import *
-from numpy import linspace, vectorize
+import numpy as np
 
 from config import *
 from utils import format_digits
@@ -24,11 +24,11 @@ class Figure():
         
         self.xmin, self.xmax = xrange
         self.ymin, self.ymax = yrange
-        self.xgrid = vectorize(format_digits)(
-            linspace(self.xmin,self.xmax,self.graph_size[0])
+        self.xgrid = np.vectorize(format_digits)(
+            np.linspace(self.xmin,self.xmax,self.graph_size[0])
         )
-        self.ygrid = vectorize(format_digits)(
-            linspace(self.ymin,self.ymax,self.graph_size[1])
+        self.ygrid = np.vectorize(format_digits)(
+            np.linspace(self.ymin,self.ymax,self.graph_size[1])
         )
         
         self.field = [[' ' for _ in range(self.field_size[0])] for _ in range(self.field_size[1])]
@@ -113,19 +113,28 @@ class Figure():
         with open(data_path, 'r') as f:
             reader = csv.reader(f)
             for row in reader:
-                data.append([float(row[0]),float(row[1])])
-        if len(data) != self.graph_size[0]:
+                if not isnan(float(row[1])):
+                    data.append([float(row[0]),float(row[1])])
+                else:
+                    data.append([float(row[0]),nan])
+        '''if len(data) != self.graph_size[0]:
             print(f'{len(data)} != {self.graph_size[0]}')
-            raise Exception(f"Something went wrong. The data you are trying to load is not the same size as the graphing space.")
+            raise Exception(f"Something went wrong. The data you are trying to load is not the same size as the graphing space.")'''
         ystart = self.graph_origin[1]
         xstart = self.graph_origin[0]
         jprev = None
+        
         for i in range(self.graph_size[0]):
             fcur = data[i][1]
+            if isnan(fcur):
+                continue 
             x = xstart + i
             j = 0
+            #if the current value is below the graph we store the offset as a negative number and move on
             if fcur < float(self.ygrid[0]):
                 j = -1
+                y = ystart - j
+            #if its above we store it as the size of the graph (one outside the index range) and set y to that value
             if fcur > float(self.ygrid[-1]):
                 j = self.graph_size[1]
                 y = ystart - j
@@ -138,17 +147,26 @@ class Figure():
                     y = ystart - j
                     self.field[y][x] = '\u25CF'
                     break
+            #print(i, jprev, j, fcur, y)
+            #handles the case where the previous is a nan so that it doesnt act like the graph should be continuous from isolated points like in x^(-x) which is real on negative integers but not in between
+            if i > 0 and isnan(data[i-1][1]):
+                jprev = j
+                continue
             #populate all cells vertically between the current and the previous datapoint
-            if i != 0 and abs(j-jprev) > 1:
-                #if the previous entry is greater than the current
-                if j < jprev:
+            if jprev != None and abs(j-jprev) > 1:
+                #if the previous entry is greater than the current and they are both in the graph
+                if j < jprev and j >= 0:
                     for k in range(ystart - jprev + 1, y):
                         self.field[k][x] = '\u25CF'
-                #if the previous entry less than the current but not from outside the graph and the current entry is inside
+                #if the previous entry is greater than the current and the current is below the graph
+                elif j < jprev and j <= 0:
+                    for k in range(ystart - jprev + 1, ystart + 1):
+                        self.field[k][x] = '\u25CF'
+                #if the previous entry less than the current and they are both in the graph
                 elif jprev >= 0:
                     for k in range(y + 1, ystart - jprev):
                         self.field[k][x-1] = '\u25CF'
-                #if the previous entry less than the current and from outside the graph
+                #if the previous entry less than the current is above the graph
                 else:
                     for k in range(y + 1, ystart + 1):
                         self.field[k][x-1] = '\u25CF'
