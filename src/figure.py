@@ -115,7 +115,8 @@ class Figure():
             for row in reader:
                 data.append([float(row[0]),float(row[1])])
         if len(data) != self.graph_size[0]:
-            raise Exception("Something went wrong. The data you are trying to load is not the same size as the graphing space.")
+            print(f'{len(data)} != {self.graph_size[0]}')
+            raise Exception(f"Something went wrong. The data you are trying to load is not the same size as the graphing space.")
         ystart = self.graph_origin[1]
         xstart = self.graph_origin[0]
         jprev = None
@@ -141,17 +142,14 @@ class Figure():
             if i != 0 and abs(j-jprev) > 1:
                 #if the previous entry is greater than the current
                 if j < jprev:
-                    print(j, jprev)
                     for k in range(ystart - jprev + 1, y):
                         self.field[k][x] = '\u25CF'
                 #if the previous entry less than the current but not from outside the graph and the current entry is inside
                 elif jprev >= 0:
-                    print(j, jprev)
                     for k in range(y + 1, ystart - jprev):
                         self.field[k][x-1] = '\u25CF'
                 #if the previous entry less than the current and from outside the graph
                 else:
-                    print(j, jprev)
                     for k in range(y + 1, ystart + 1):
                         self.field[k][x-1] = '\u25CF'
             jprev = j
@@ -159,13 +157,13 @@ class Figure():
         
         
 
-fig = Figure(xrange=(-2,2), yrange=(-2,4), scale=2)
+'''fig = Figure(xrange=(-2,2), yrange=(-2,4), scale=2)
 fig.build_axes()
 print(f'field size: {fig.field_size}')
 print(f'graph size: {fig.graph_size}')
 print(f'graph origin: {fig.graph_origin}')
 print(f'axis origin: {fig.axis_origin}')
 fig.load_data("data.csv")
-print(fig)
+print(fig)'''
 
 
