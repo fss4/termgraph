@@ -2,8 +2,8 @@ import csv
 from math import *
 import numpy as np
 
-from config import *
-from utils import format_digits
+from termgraph.config import *
+from termgraph.utils import format_digits, bin_data
 
 class Figure():
     def __init__(self, xrange=XRANGE, yrange=YRANGE, scale=SCALE):
@@ -108,7 +108,7 @@ class Figure():
             self.field[self.graph_origin[1] - (self.graph_size[1] - 1)][self.graph_origin[0]] = '\u25CF'
             self.field[self.graph_origin[1] - (self.graph_size[1] - 1)][self.graph_origin[0] + self.graph_size[0] - 1] = '\u25CF'
             
-    def load_data(self, data_path):
+    def load_function(self, data_path):
         data = []
         with open(data_path, 'r') as f:
             reader = csv.reader(f)
@@ -117,9 +117,7 @@ class Figure():
                     data.append([float(row[0]),float(row[1])])
                 else:
                     data.append([float(row[0]),nan])
-        '''if len(data) != self.graph_size[0]:
-            print(f'{len(data)} != {self.graph_size[0]}')
-            raise Exception(f"Something went wrong. The data you are trying to load is not the same size as the graphing space.")'''
+
         ystart = self.graph_origin[1]
         xstart = self.graph_origin[0]
         jprev = None
@@ -171,17 +169,29 @@ class Figure():
                     for k in range(y + 1, ystart + 1):
                         self.field[k][x-1] = '\u25CF'
             jprev = j
-                    
+            
+    def load_list(self, data_path):
+        #this data is pre-processed so that the x-values are already offsets
+        data = []
+        with open(data_path, 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if not isnan(float(row[1])):
+                    data.append([int(row[0]),float(row[1])])
+                else:
+                    data.append([int(row[0]),nan])
         
+        ystart = self.graph_origin[1]
+        xstart = self.graph_origin[0]
+        datacpy = data.copy()
+        #remove out of range points
+        for pt in datacpy:
+            if pt[1] > self.ymax or pt[1] < self.ymin:
+                data.remove(pt)
+        #turn the y-values into offsets
+        data.sort(key = lambda pt:pt[1])
+        data = bin_data(data,np.asarray(self.ygrid, dtype=float),pos=1)
+        for pt in data:
+            self.field[ystart - pt[1]][xstart + pt[0]] = '\u25CF'
         
-
-'''fig = Figure(xrange=(-2,2), yrange=(-2,4), scale=2)
-fig.build_axes()
-print(f'field size: {fig.field_size}')
-print(f'graph size: {fig.graph_size}')
-print(f'graph origin: {fig.graph_origin}')
-print(f'axis origin: {fig.axis_origin}')
-fig.load_data("data.csv")
-print(fig)'''
-
-
+                

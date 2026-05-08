@@ -1,12 +1,13 @@
 import ast
 import os
 import warnings
+import csv
 
 from simpleeval import SimpleEval, BASIC_ALLOWED_ATTRS, safe_power
 from math import *
 from numpy import linspace
 
-from config import *
+from termgraph.config import *
 
 def gen_fdata(f_str, xmin, xmax, scale):
     def f(x):
@@ -20,7 +21,6 @@ def gen_fdata(f_str, xmin, xmax, scale):
         return s.eval(f_str)
     
     size = (floor(XDIFF * scale) * NUMARK) + 1
-    print(size)
     xgrid = linspace(xmin,xmax,size)
     res = []
     for x in xgrid:
@@ -64,10 +64,65 @@ def format_digits(x):
     else:
         return str(x)
     
-def interpolate(x0, x1):
-    pass
-    
+def interpolate(x0, y0, x1, y1, ncells):
+    xgrid = linspace(x0,x1,ncells)
+    tgrid = linspace(0,1,ncells)
+    res = []
+    for i in range(ncells):
+        yval = y1*tgrid[i] + y0*(1-tgrid[i])
+        res.append[[xgrid[i],yval]]
+    return res
 
+def bin_data(data, grid, pos=0):
+    '''
+    This function bins a sorted dataset (given as a list of lists) into a given grid.
+    The grid values are taken to be the middle of the bins.
+    The dataset is assumed to lie entirely within the grid.
+    Optional value pos is in case you want to bin along a different value than the first one.
+    '''
+    size = len(grid)
+    binsize = grid[1]-grid[0]
+    iprev = 0
+    data_cpy = data.copy()
+    for pt in data_cpy:
+        i = iprev
+            
+        while not ((grid[i] - .5*binsize) <= pt[pos] < (grid[i] + .5*binsize)):
+            i += 1
+            if i >= size:
+                raise Exception("An error has occurred, binning has left the graph area.")
+        pt[pos] = i
+        iprev = i
+    return data_cpy
+        
+def data_align(data_path, xmin, xmax, scale):
+    data = []
+    size = (floor(XDIFF * scale) * NUMARK) + 1
+    xgrid = linspace(xmin,xmax,size)
+    
+    with open(data_path, 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if not isnan(float(row[1])):
+                    data.append([float(row[0]),float(row[1])])
+                else:
+                    data.append([float(row[0]),nan])
+
+    data.sort(key = lambda x: x[0])
+
+    tmp = data.copy()
+    for pt in tmp:
+        if pt[0] < xmin or pt[0] > xmax:
+            data.remove(pt)
+    
+    graph_data = bin_data(data,xgrid)
+    
+    with open(data_path, "w", newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(graph_data)
+        
+        
+        
         
         
 
