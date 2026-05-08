@@ -10,7 +10,9 @@ termgraph -x -5 10 -y -.3 1.1 -s 1.4 "sin(x)/x"
 ```
 ![img](img/sinc.png)
 
-or for a polynomial with no optional settings:
+Here the `-x` and `-y` flags are for setting the domain and range of the graph.  The scale multiplier is set by `-s`, this makes the graph larger on your screen.
+
+Alternatively, for a polynomial with no optional settings the default would just be:
 ```
 termgraph "x**3"
 ```
@@ -30,4 +32,11 @@ termgraph -l test/test_data.csv
 ```
 ![img](img/scatter.png)
 
-The `-a` flag is also available for lists of data in which case it scales the x and y axes to fit all points.
+The test data here is created by running the test.py program available in the test directory; its just some gaussian data centered at 0.  
+If you dont have two column csv data readily available this would be an easy way to play with the 
+scatter plot functionality.  To generate the data, inside the main directory simply run
+```
+python3 test/test.py [NUM DATA PTS TO GENERATE]
+```
+
+The `-a` flag is also available for lists of data in which case it scales the x and y axes to fit all points.  This is very useful if you do not know the scale of the data you want to plot

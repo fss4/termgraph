@@ -8,7 +8,7 @@ script_dir = os.path.dirname(__file__)
 data = []
 for _ in range(int(sys.argv[1])):
     x = r.gauss()
-    y = r.gauss(1,0)  
+    y = r.gauss()  
     data.append([x,y])
     
 with open(os.path.join(script_dir,"test_data.csv"), "w") as f:
