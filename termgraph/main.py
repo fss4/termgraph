@@ -46,11 +46,9 @@ def main():
         args.xrange = (min(data,key=lambda x:x[0])[0], max(data,key=lambda x:x[0])[0])
         args.yrange = (min(data,key=lambda x:x[1])[1], max(data,key=lambda x:x[1])[1])
         if (args.xrange[0]  == args.xrange[1]):
-            args.xrange[0] -= .1
-            args.xrange[1] += .1
+            args.xrange = (args.xrange[0] - .1, args.xrange[1] + .1)
         if (args.yrange[0]  == args.yrange[1]):
-            args.yrange[0] -= .1
-            args.yrange[1] += .1
+            args.yrange = (args.yrange[0] - .1, args.yrange[1] + .1)
     fig = Figure(xrange=args.xrange, yrange=args.yrange, scale=args.scale)
     fig.build_axes()
     
