@@ -2,6 +2,16 @@
 -----------
 This is a simple CLI-based program that acts as a graphing calculator in the terminal. The default behavior is to take a python-formatted function as input which is then output as a graph in the terminal.  There is also functionality for a `.csv` file input formatted as pairs of (x,y) points which is then graphed in the terminal.  The program  can plot any of the usual real, piecewise continuous functions available in Python's `math` module.
 
+##Installation
+-----------
+To install the program you can either clone the repo and then work inside of it once you set up the venv.
+
+Alternatively, there is an installation script available here that uses [pipx](https://pipx.pypa.io/stable/) to install it (without cluttering up your python install) in a way that makes the `termgraph` command available anywhere in your terminal.  All this does is pipe the `install.sh` script into bash and you can check it here if you want to make sure its safe.
+```
+curl -fSL https://raw.githubusercontent.com/fss4/termgraph/main/install.sh | bash
+```
+be sure to run this command in whatever directory you want the repo installed.  Probably a downloads folder or something
+
 ## Plotting Functions:
 -----------
 In order to plot functions one runs something along the lines of:
