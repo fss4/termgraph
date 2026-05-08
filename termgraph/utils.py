@@ -78,7 +78,9 @@ def bin_data(data, grid, pos=0):
     data_cpy = data.copy()
     for pt in data_cpy:
         i = iprev
+        #print(pt)
         while not ((grid[i] - .5*binsize) <= pt[pos] < (grid[i] + .5*binsize)):
+            #print(((grid[i] - .5*binsize) , pt[pos] , (grid[i] + .5*binsize)))    
             i += 1
             if i >= size:
                 raise Exception("An error has occurred, binning has left the graph area.")
