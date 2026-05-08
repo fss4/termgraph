@@ -40,7 +40,7 @@ class Figure():
                fig += ''.join(line) + '\n'
         return fig
     
-    def build_axes(self, check_alignment=False):
+    def build_axes(self):
         
         #These are some odd spots that aren't affected by the loops so we define them by hand
         self.field[self.axis_origin[1]][self.axis_origin[0]] = '\u2514'
@@ -100,13 +100,6 @@ class Figure():
                 #self.field[y][x-pt:x-pt+len(xmarkers[label])] = xmarkers[label]
                 #label += 1
                 
-        #If check_alignment is true this puts a dot at each of the four corners of the graph area.
-        #primarily useful if tweaking stuff
-        if check_alignment:
-            self.field[self.graph_origin[1]][self.graph_origin[0]] = '\u25CF'
-            self.field[self.graph_origin[1]][self.graph_origin[0]  + self.graph_size[0] - 1] = '\u25CF'
-            self.field[self.graph_origin[1] - (self.graph_size[1] - 1)][self.graph_origin[0]] = '\u25CF'
-            self.field[self.graph_origin[1] - (self.graph_size[1] - 1)][self.graph_origin[0] + self.graph_size[0] - 1] = '\u25CF'
             
     def load_function(self, data_path):
         data = []
@@ -176,21 +169,12 @@ class Figure():
         with open(data_path, 'r') as f:
             reader = csv.reader(f)
             for row in reader:
-                if not isnan(float(row[1])):
-                    data.append([int(row[0]),float(row[1])])
-                else:
-                    data.append([int(row[0]),nan])
+                data.append([int(row[0]),int(row[1])])
+
         
         ystart = self.graph_origin[1]
         xstart = self.graph_origin[0]
-        datacpy = data.copy()
-        #remove out of range points
-        for pt in datacpy:
-            if pt[1] > self.ymax or pt[1] < self.ymin:
-                data.remove(pt)
-        #turn the y-values into offsets
-        data.sort(key = lambda pt:pt[1])
-        data = bin_data(data,np.asarray(self.ygrid, dtype=float),pos=1)
+
         for pt in data:
             self.field[ystart - pt[1]][xstart + pt[0]] = '\u25CF'
         

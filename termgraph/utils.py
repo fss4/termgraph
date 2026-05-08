@@ -64,14 +64,6 @@ def format_digits(x):
     else:
         return str(x)
     
-def interpolate(x0, y0, x1, y1, ncells):
-    xgrid = linspace(x0,x1,ncells)
-    tgrid = linspace(0,1,ncells)
-    res = []
-    for i in range(ncells):
-        yval = y1*tgrid[i] + y0*(1-tgrid[i])
-        res.append[[xgrid[i],yval]]
-    return res
 
 def bin_data(data, grid, pos=0):
     '''
@@ -86,7 +78,6 @@ def bin_data(data, grid, pos=0):
     data_cpy = data.copy()
     for pt in data_cpy:
         i = iprev
-            
         while not ((grid[i] - .5*binsize) <= pt[pos] < (grid[i] + .5*binsize)):
             i += 1
             if i >= size:
@@ -95,27 +86,34 @@ def bin_data(data, grid, pos=0):
         iprev = i
     return data_cpy
         
-def data_align(data_path, xmin, xmax, scale):
+def data_align(data_path, xmin, xmax, ymin, ymax, scale):
     data = []
-    size = (floor(XDIFF * scale) * NUMARK) + 1
-    xgrid = linspace(xmin,xmax,size)
+    xsize = (floor(XDIFF * scale) * NUMARK) + 1
+    ysize = (floor(YDIFF * scale) * NUMARK) + 1
+
+    xgrid = linspace(xmin,xmax,xsize)
+    ygrid = linspace(ymin,ymax,ysize)
     
     with open(data_path, 'r') as f:
             reader = csv.reader(f)
             for row in reader:
-                if not isnan(float(row[1])):
+                if isfinite(float(row[0])) and isfinite(float(row[1])):
                     data.append([float(row[0]),float(row[1])])
                 else:
-                    data.append([float(row[0]),nan])
-
-    data.sort(key = lambda x: x[0])
+                    raise Exception("There appears to be bad points (either NaN or inf) in your data.  Please clean it before trying to plot.")
 
     tmp = data.copy()
     for pt in tmp:
         if pt[0] < xmin or pt[0] > xmax:
             data.remove(pt)
-    
-    graph_data = bin_data(data,xgrid)
+    tmp = data.copy()
+    for pt in tmp:
+        if pt[1] < ymin or pt[1] > ymax:
+            data.remove(pt)
+    data.sort(key = lambda x: x[0])
+    data = bin_data(data,xgrid,pos=0)
+    data.sort(key = lambda x: x[1])
+    graph_data = bin_data(data,ygrid,pos=1)
     
     with open(data_path, "w", newline='') as file:
         writer = csv.writer(file)

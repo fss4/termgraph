@@ -56,7 +56,7 @@ def main():
         print(fig)
         
     elif args.l:
-        data_align(os.path.join(script_dir,"data.csv"), args.xrange[0], args.xrange[1], args.scale)
+        data_align(os.path.join(script_dir,"data.csv"), *args.xrange, *args.yrange, args.scale)
         fig.load_list(os.path.join(script_dir,"data.csv"))
         print("\n")
         print(f'Data from {args.data}')
