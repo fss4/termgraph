@@ -37,8 +37,10 @@ def gen_fdata(f_str, xmin, xmax, scale):
             file.write(f"{pt[0]},{pt[1]}\n")
 
 def format_digits(x):
+    #we only are allowing numbers with less than three digits in the power of ten
     if ((x >= 1e100 or x <= -1e100) or (-1e-99 < x < 1e-99)) and x != 0:
         raise Exception("Range and domain must be strictly in (-1e100, -1e-99) \u222A (1e-99, 1e100).")
+    #If the number is positive we have 8 spaces for digits
     if x > 0:
         if x >= 100000000 or x < 0.000001:
             return f'{x:.2e}'
@@ -50,6 +52,7 @@ def format_digits(x):
                 return str(round(x,6-oom))
             else:
                 return str(round(x,6))
+    #If the number is negative we have 7 spaces.  The sign takes up one
     elif x < 0:
         if x <= -10000000 or x > -0.00001:
             return f'{x:.1e}'
