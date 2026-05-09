@@ -87,21 +87,6 @@ class Figure():
                 self.field[y][x] = '\u2500' 
         
         
-        '''x = self.axis_origin[0] - 1
-        
-        for y in range(self.field_size[1]):
-            if y % self.diff[1] == 0 and y <= self.graph_size[1]:
-                #label += 1
-                pass
-                
-        y = self.axis_origin[1] + 1
-        label = 0
-        for x in range(self.axis_origin[0] + 1, self.field_size[0] - 1):
-            if x % self.diff[0] == XPAD:
-                pt = len(xmarkers[label])//2
-                #self.field[y][x-pt:x-pt+len(xmarkers[label])] = xmarkers[label]
-                #label += 1'''
-    
     def build_origin(self):
         ystart = self.graph_origin[1]
         xstart = self.graph_origin[0]
@@ -135,10 +120,7 @@ class Figure():
             for x in range(self.graph_size[0]):
                 self.field[ystart - y][xstart + x] = '\u00B7'
         
-        
-        
-        
-            
+             
     def load_function(self, data_path):
         data = []
         with open(data_path, 'r') as f:
