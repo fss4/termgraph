@@ -36,6 +36,39 @@ def gen_fdata(f_str, xmin, xmax, scale):
         for pt in res:
             file.write(f"{pt[0]},{pt[1]}\n")
 
+def gen_pdata(p_str, tmin, tmax):
+    tmp = p_str.split(",")
+    if len(tmp) != 2: raise Exception("Parametric functions must be strings containing two functions in t and seperated by a comma.")
+    x_str = tmp[0]
+    y_str = tmp[1]
+    funcs = {"exp":exp, "ln": log, "log": log, "log2": log2, "log10":log10,
+            "acos": acos, "asin":asin, "atan":atan,"cos":cos,"sin":sin,"tan":tan,
+            "acosh":acosh,"asinh":asinh,"atanh":atanh,"cosh":cosh,"sinh":sinh, "tanh":tanh,
+            "erf": erf, "erfc":erfc, "gamma":gamma, "lgamma":lgamma}
+    def x(t):
+        s = SimpleEval(allowed_attrs=BASIC_ALLOWED_ATTRS)
+        s.operators[ast.BitXor] = safe_power
+        s.functions = funcs
+        s.names = {"t" : t}
+        return s.eval(x_str)
+    def y(t):
+        s = SimpleEval(allowed_attrs=BASIC_ALLOWED_ATTRS)
+        s.operators[ast.BitXor] = safe_power
+        s.functions = funcs
+        s.names = {"t" : t}
+        return s.eval(y_str)
+
+    tgrid = linspace(tmin, tmax, TSIZE)
+    res = []
+    for t in tgrid:
+        res.append([float(x(t)),float(y(t))])
+
+    script_dir = os.path.dirname(__file__)
+    filepath = os.path.join(script_dir, "data.csv")
+    with open(filepath, "w") as file:
+        for pt in res:
+            file.write(f"{pt[0]},{pt[1]}\n")
+    
 def format_digits(x):
     #we only are allowing numbers with less than three digits in the power of ten
     if ((x >= 1e100 or x <= -1e100) or (-1e-99 < x < 1e-99)) and x != 0:

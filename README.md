@@ -53,9 +53,10 @@ The `-a` flag is also available for lists of data in which case it scales the x 
 
 ## Available Flags
 -----------
-- `-l` Indicates the input is a filepath to a dataset. 
+- `-l` Indicates the input is a filepath to a dataset.
+- `-p` \[TMIN\] \[TMAX\] Indicates the input is a parametric function "x(t),y(t)".
 - `-x` \[XMIN\] \[XMAX\] Customize the domain of the graph.
 - `-y` \[YMIN\] \[YMAX\] Customize the range of the graph.
-- `-o` \[X-POSITION\] \[Y-POSITION\] Customize the origin of the graph and place lines going through it.  No argument defaults to (0,0).
+- `-o` \[XPOS\] \[YPOS\] Customize the origin of the graph and place lines going through it.  No argument defaults to (0,0).
 - `-s` \[SCALE\] Scale factor to resize the graph.
-- `-a` Indicates the graph should have its range set automatically.  If the input is a list of data the x-axis will also be changed.
+- `-a` Indicates the graph should have its range set automatically.  Lists and parametric functions will have the domain changed as well.

@@ -23,3 +23,7 @@ XRANGE = (-2,2)
 YRANGE = (-2,2)
 ORIGIN = (0,0)
 
+#Default range for parametric functions
+TRANGE = [0,1]
+TSIZE = 1000
+
