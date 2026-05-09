@@ -34,6 +34,12 @@ termgraph "x**3 - 2*x" -a
 ```
 ![img](img/autoscale.png)
 
+Parametric functions can be plotted using the `-p` flag:
+```
+termgraph "(2*cos(t)+5*cos((2/3)*t)),(2*sin(t)-5*sin((2/3)*t))" -p 0 100 -s 2.5 -a -o
+```
+![img](img/parametric.png)
+
 ## Plotting Data
 -----------
 In order to plot data you must set the `-l` flag and provide a path to a `.csv`.  For example:
