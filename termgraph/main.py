@@ -25,12 +25,13 @@ def main():
     parser.add_argument('-s', '--scale', type=float, default=SCALE, help='Scale multiplier for the size of the graph to be plotted in terminal. 1.0 by default.')
     parser.add_argument('-a', action='store_true', help='Flag indicating the range should be auto-adjusted to match max and min values of f(x) (assuming they arent infinite); for a function or the maximum datapoint '\
                         'values for a list.  If the flag is not set the plot will use the default range.')
+    parser.add_argument('-o', nargs='*',type=float, default=False, help='Turns on lines through the origin.  If no argument is given the origin is set to (0,0).')
 
 
     args = parser.parse_args()
     
     if (args.xrange[0] >= args.xrange[1]) or (args.yrange[0] >= args.yrange[1]):
-        raise Exception("Range and domain must be ordered tuples where the first entry is strictly less than the second")
+        parser.error("Range and domain must be ordered tuples where the first entry is strictly less than the second")
     
     if not args.l:
         gen_fdata(args.data, args.xrange[0], args.xrange[1], args.scale)
@@ -38,7 +39,7 @@ def main():
         try:
             shutil.copyfile(args.data, os.path.join(script_dir,"data.csv"))
         except:
-            raise Exception("An error has occured.  Perhaps you tried to graph a function with -l on?")
+            parser.error("An error has occured.  Perhaps you tried to graph a function with -l on?")
     
     if args.a:
         data = []
@@ -56,6 +57,14 @@ def main():
             args.yrange = (args.yrange[0] - .1, args.yrange[1] + .1)
     fig = Figure(xrange=args.xrange, yrange=args.yrange, scale=args.scale)
     fig.build_axes()
+    if args.o is not False:
+        if len(args.o) != 2 and len(args.o) != 0:
+            parser.error("-o only takes 0 or 2 arguments.")
+        elif len(args.o) == 2:
+            fig.origin = args.o
+            fig.build_origin()
+        else:
+            fig.build_origin()
     
     if not args.l:
         fig.load_function(os.path.join(script_dir,"data.csv"))

@@ -50,3 +50,12 @@ python3 test/test.py [NUM DATA PTS TO GENERATE]
 ```
 
 The `-a` flag is also available for lists of data in which case it scales the x and y axes to fit all points.  This is very useful if you do not know the scale of the data you want to plot
+
+## Available Flags
+-----------
+- `-l` Indicates the input is a filepath to a dataset. 
+- `-x` \[XMIN\] \[XMAX\] Customize the domain of the graph.
+- `-y` \[YMIN\] \[YMAX\] Customize the range of the graph.
+- `-o` \[X-POSITION\] \[Y-POSITION\] Customize the origin of the graph and place lines going through it.  No argument defaults to (0,0).
+- `-s` \[SCALE\] Scale factor to resize the graph.
+- `-a` Indicates the graph should have its range set automatically.  If the input is a list of data the x-axis will also be changed.

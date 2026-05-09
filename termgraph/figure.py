@@ -6,11 +6,12 @@ from termgraph.config import *
 from termgraph.utils import format_digits, bin_data
 
 class Figure():
-    def __init__(self, xrange=XRANGE, yrange=YRANGE, scale=SCALE):
-        if scale < 1:
-            raise Exception("Scale must be greater than 1.0.")
+    def __init__(self, xrange=XRANGE, yrange=YRANGE, scale=SCALE, origin=ORIGIN):
+
         self.scale = scale
         self.diff = (floor(XDIFF * self.scale), floor(YDIFF * self.scale))
+        if 0 in self.diff:
+            raise Exception("Your scale multiplier is too small and the graph cannot be rendered.") 
         self.graph_size = ((self.diff[0] * NUMARK) + 1, (self.diff[1] * NUMARK) + 1)
         
         # +2 in first entry is for axis (space needed on left to make markers the correct size),
@@ -22,6 +23,7 @@ class Figure():
         self.axis_origin = (NUMCHAR + 1, self.field_size[1] - 1 - 1)
         self.graph_origin = (NUMCHAR + 2 + XPAD, self.field_size[1] - 1 - 2 - YPAD)
         
+        self.origin = origin
         self.xmin, self.xmax = xrange
         self.ymin, self.ymax = yrange
         self.xgrid = np.vectorize(format_digits)(
@@ -85,7 +87,7 @@ class Figure():
                 self.field[y][x] = '\u2500' 
         
         
-        x = self.axis_origin[0] - 1
+        '''x = self.axis_origin[0] - 1
         
         for y in range(self.field_size[1]):
             if y % self.diff[1] == 0 and y <= self.graph_size[1]:
@@ -98,8 +100,44 @@ class Figure():
             if x % self.diff[0] == XPAD:
                 pt = len(xmarkers[label])//2
                 #self.field[y][x-pt:x-pt+len(xmarkers[label])] = xmarkers[label]
-                #label += 1
+                #label += 1'''
+    
+    def build_origin(self):
+        ystart = self.graph_origin[1]
+        xstart = self.graph_origin[0]
+        
+        xgrid = np.vectorize(float)(self.xgrid)
+        ygrid = np.vectorize(float)(self.ygrid)
+        xbin = xgrid[1]-xgrid[0]
+        ybin = ygrid[1]-ygrid[0]
+        origin_coord = [None,None]
+        if self.xmin < self.origin[0] < self.xmax:
+            for i in range(self.graph_size[0]):
+                if i == 0 and ((xgrid[i] - .5*xbin) <= self.origin[0]  < (xgrid[i] + .5*xbin)):
+                    origin_coord[0] = 0
+                    break
+                if i > 0 and ((xgrid[i-1] + .5*xbin) <= self.origin[0] < (xgrid[i] + .5*xbin)):
+                    origin_coord[0] = i
+                    break
+            x = origin_coord[0]
+            for y in range(self.graph_size[1]):
+                self.field[ystart - y][xstart + x] = '\u00B7'
                 
+        if self.ymin < self.origin[1] < self.ymax:
+            for i in range(self.graph_size[1]):
+                if i == 0 and ((ygrid[i] - .5*ybin) <= self.origin[1]  < (ygrid[i] + .5*ybin)):
+                    origin_coord[1] = 0
+                    break
+                if i > 0 and ((ygrid[i-1] + .5*ybin) <= self.origin[1] < (ygrid[i] + .5*ybin)):
+                    origin_coord[1] = i
+                    break
+            y = origin_coord[1]
+            for x in range(self.graph_size[0]):
+                self.field[ystart - y][xstart + x] = '\u00B7'
+        
+        
+        
+        
             
     def load_function(self, data_path):
         data = []

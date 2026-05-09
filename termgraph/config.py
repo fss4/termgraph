@@ -21,4 +21,5 @@ NUMCHAR = 8
 #Default ranges for the graph
 XRANGE = (-2,2)
 YRANGE = (-2,2)
+ORIGIN = (0,0)
 
