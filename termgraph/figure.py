@@ -113,55 +113,35 @@ class Figure():
 
         ystart = self.graph_origin[1]
         xstart = self.graph_origin[0]
-        jprev = None
         
-        for i in range(self.graph_size[0]):
-            fcur = data[i][1]
-            if isnan(fcur):
-                continue 
-            x = xstart + i
-            j = 0
-            #if the current value is below the graph we store the offset as a negative number and move on
-            if fcur < float(self.ygrid[0]):
-                j = -1
-                y = ystart - j
-            #if its above we store it as the size of the graph (one outside the index range) and set y to that value
-            if fcur > float(self.ygrid[-1]):
-                j = self.graph_size[1]
-                y = ystart - j
-            #find the cell to populate given the function value
-            while 0 <= j < self.graph_size[1]:
-                if float(self.ygrid[j]) < fcur:
-                    j += 1
-                    continue
-                else:
-                    y = ystart - j
-                    self.field[y][x] = '\u25CF'
-                    break
-            #print(i, jprev, j, fcur, y)
-            #handles the case where the previous is a nan so that it doesnt act like the graph should be continuous from isolated points like in x^(-x) which is real on negative integers but not in between
-            if i > 0 and isnan(data[i-1][1]):
-                jprev = j
+        data = bin_data(data,np.vectorize(float)(self.xgrid),pos=0)
+        binsize = float(self.ygrid[1]) - float(self.ygrid[0])
+        for pt in data:
+            if (self.ymax + .5*binsize) <= pt[1]:
+                pt[1] = self.graph_size[1]
+            elif pt[1] < (self.ymin - .5*binsize):
+                pt[1] = -1
+            else:
+                for i in range(self.graph_size[1]):
+                    if i == 0 and ((float(self.ygrid[i]) - .5*binsize) <= pt[1] < (float(self.ygrid[i]) + .5*binsize)):
+                        pt[1] = i
+                        break
+                    if i > 0 and ((float(self.ygrid[i-1]) + .5*binsize) <= pt[1] < (float(self.ygrid[i]) + .5*binsize)):
+                        pt[1] = i
+                        break
+        
+        for i, pt in enumerate(data):
+            if not isfinite(pt[1]):
                 continue
-            #populate all cells vertically between the current and the previous datapoint
-            if jprev != None and abs(j-jprev) > 1:
-                #if the previous entry is greater than the current and they are both in the graph
-                if j < jprev and j >= 0:
-                    for k in range(ystart - jprev + 1, y):
-                        self.field[k][x] = '\u25CF'
-                #if the previous entry is greater than the current and the current is below the graph
-                elif j < jprev and j <= 0:
-                    for k in range(ystart - jprev + 1, ystart + 1):
-                        self.field[k][x] = '\u25CF'
-                #if the previous entry less than the current and they are both in the graph
-                elif jprev >= 0:
-                    for k in range(y + 1, ystart - jprev):
-                        self.field[k][x-1] = '\u25CF'
-                #if the previous entry less than the current is above the graph
-                else:
-                    for k in range(y + 1, ystart + 1):
-                        self.field[k][x-1] = '\u25CF'
-            jprev = j
+            if 0 <= pt[1] < self.graph_size[1]:
+                self.field[ystart - pt[1]][xstart + pt[0]] = '\u25CF'
+            if (0 <= i < len(data) -1) and pt[1] > data[i+1][1] + 1:
+                for j in range(data[i+1][1] + 1, pt[1]):
+                    self.field[ystart - j][xstart + data[i][0]] = '\u25CF'
+            elif (0 <= i < len(data) -1) and pt[1] + 1 < data[i+1][1]:
+                for j in range(pt[1] + 1, data[i+1][1]):
+                    self.field[ystart - j][xstart + data[i+1][0]] = '\u25CF'
+        
             
     def load_list(self, data_path):
         #this data is pre-processed so that the x-values are already offsets

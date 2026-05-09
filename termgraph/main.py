@@ -17,8 +17,9 @@ def main():
     #There are two modes.  The default expectation is the input is simply the RHS of f(x) = polynomial.
     parser.add_argument('-l', action='store_true',help='Indicates that a list is to be graphed rather than a polynomial')
     parser.add_argument('data', type=str, help='This defines what is to be graphed. By default it should be a polynomial in x using python formatting i.e. "x**3 + 2*x**2 + 3". If -l is set it should be a path to an'\
-                        'appropriately formatted .csv file containing (x,y) values on each line.  Leading negative signs must be written as multiplication by (-1) e.g. (-1)*x**3. Between terms in a function this is not necessary.  '\
-                        'If spaces are not included in your function it is not necessary to enter it in quotes but it is recommended to always do so.')
+                        'appropriately formatted .csv file containing (x,y) values on each line.  Leading negative signs must be written as multiplication by (-1) or placed in parentheses e.g. (-1)*x**3 or (-x**3). Between terms in a function this is not necessary.  '\
+                        'If spaces are not included in your function it is not necessary to enter it in quotes but it is recommended to always do so.  Use of ^ for exponents is included but the entire term must be placed in '\
+                        'parentheses or whatever follows will be included in the exponent i.e. "(x^2) - 3" != "x^2 - 3" = "x^-1".')
     parser.add_argument('-x', '--xrange', nargs=2, metavar=('XMIN','XMAX'), type=float, default=XRANGE, help=f'Two-entry option that defines the domain of the graph. Default is {XRANGE[0]}, {XRANGE[1]}.')
     parser.add_argument('-y', '--yrange', nargs=2, metavar=('YMIN','YMAX'), type=float, default=YRANGE, help=f'Two-entry option that defines the range of the graph. Default is {YRANGE[0]}, {YRANGE[1]}.')
     parser.add_argument('-s', '--scale', type=float, default=SCALE, help='Scale multiplier for the size of the graph to be plotted in terminal. 1.0 by default.')
@@ -34,7 +35,10 @@ def main():
     if not args.l:
         gen_fdata(args.data, args.xrange[0], args.xrange[1], args.scale)
     else:
-        shutil.copyfile(args.data, os.path.join(script_dir,"data.csv"))
+        try:
+            shutil.copyfile(args.data, os.path.join(script_dir,"data.csv"))
+        except:
+            raise Exception("An error has occured.  Perhaps you tried to graph a function with -l on?")
     
     if args.a:
         data = []
@@ -43,7 +47,8 @@ def main():
             for row in reader:
                 if ((isfinite(float(row[1])) and isfinite(float(row[0])))):
                     data.append([float(row[0]),float(row[1])])
-        args.xrange = (min(data,key=lambda x:x[0])[0], max(data,key=lambda x:x[0])[0])
+        if args.l:
+            args.xrange = (min(data,key=lambda x:x[0])[0], max(data,key=lambda x:x[0])[0])
         args.yrange = (min(data,key=lambda x:x[1])[1], max(data,key=lambda x:x[1])[1])
         if (args.xrange[0]  == args.xrange[1]):
             args.xrange = (args.xrange[0] - .1, args.xrange[1] + .1)
