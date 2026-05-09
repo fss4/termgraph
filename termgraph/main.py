@@ -25,7 +25,7 @@ def main():
     parser.add_argument('-s', '--scale', type=float, default=SCALE, help='Scale multiplier for the size of the graph to be plotted in terminal. 1.0 by default.')
     parser.add_argument('-a', action='store_true', help='Flag indicating the range should be auto-adjusted to match max and min values of f(x) (assuming they arent infinite); for a function or the maximum datapoint '\
                         'values for a list.  If the flag is not set the plot will use the default range.')
-    parser.add_argument('-o', nargs='*',type=float, default=False, help='Turns on lines through the origin.  If no argument is given the origin is set to (0,0).')
+    parser.add_argument('-o', nargs='*',metavar=('XPOS','YPOS'), ,type=float, default=False, help='Turns on lines through the origin.  If no argument is given the origin is set to (0,0).')
 
 
     args = parser.parse_args()
