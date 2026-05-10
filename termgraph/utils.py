@@ -9,15 +9,18 @@ from numpy import linspace
 
 from termgraph.config import *
 
+funcs = {"exp":exp, "ln": log, "log": log, "log2": log2, "log10":log10,
+            "acos": acos, "asin":asin, "atan":atan,"cos":cos,"sin":sin,"tan":tan,
+            "acosh":acosh,"asinh":asinh,"atanh":atanh,"cosh":cosh,"sinh":sinh, "tanh":tanh,
+            "erf": erf, "erfc":erfc, "gamma":gamma, "lgamma":lgamma, "sqrt":sqrt, "cbrt":cbrt,
+            "floor":floor, "ceil":ceil, "fabs":fabs}
+
 def gen_fdata(f_str, xmin, xmax, scale):
     def f(x):
         s = SimpleEval(allowed_attrs=BASIC_ALLOWED_ATTRS)
         s.operators[ast.BitXor] = safe_power
-        s.functions = {"exp":exp, "ln": log, "log": log, "log2": log2, "log10":log10,
-                       "acos": acos, "asin":asin, "atan":atan,"cos":cos,"sin":sin,"tan":tan,
-                       "acosh":acosh,"asinh":asinh,"atanh":atanh,"cosh":cosh,"sinh":sinh, "tanh":tanh,
-                       "erf": erf, "erfc":erfc, "gamma":gamma, "lgamma":lgamma}
-        s.names = {"x" : x}
+        s.functions = funcs
+        s.names = {"x" : x, "pi": pi, "e":e, "tau":tau}
         return s.eval(f_str)
     
     size = (floor(XDIFF * scale) * NUMARK) + 1
@@ -41,21 +44,18 @@ def gen_pdata(p_str, tmin, tmax):
     if len(tmp) != 2: raise Exception("Parametric functions must be strings containing two functions in t and seperated by a comma.")
     x_str = tmp[0]
     y_str = tmp[1]
-    funcs = {"exp":exp, "ln": log, "log": log, "log2": log2, "log10":log10,
-            "acos": acos, "asin":asin, "atan":atan,"cos":cos,"sin":sin,"tan":tan,
-            "acosh":acosh,"asinh":asinh,"atanh":atanh,"cosh":cosh,"sinh":sinh, "tanh":tanh,
-            "erf": erf, "erfc":erfc, "gamma":gamma, "lgamma":lgamma}
+    
     def x(t):
         s = SimpleEval(allowed_attrs=BASIC_ALLOWED_ATTRS)
         s.operators[ast.BitXor] = safe_power
         s.functions = funcs
-        s.names = {"t" : t}
+        s.names = {"t" : t, "pi": pi, "e":e, "tau":tau}
         return s.eval(x_str)
     def y(t):
         s = SimpleEval(allowed_attrs=BASIC_ALLOWED_ATTRS)
         s.operators[ast.BitXor] = safe_power
         s.functions = funcs
-        s.names = {"t" : t}
+        s.names = {"t" : t, "pi": pi, "e":e, "tau":tau}
         return s.eval(y_str)
 
     tgrid = linspace(tmin, tmax, TSIZE)
